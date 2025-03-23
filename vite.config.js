@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5001", // Replace with your API server
+        target: "http://localhost:5000", // Replace with your API server
         changeOrigin: true,
         secure: false, // Set to true if using HTTPS and a valid certificate
         rewrite: (path) => path.replace(/^\/api/, ""), // Optional: remove '/api' prefix
