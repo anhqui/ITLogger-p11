@@ -36,10 +36,25 @@ export const addLog = createAsyncThunk("addLog", async (log, thunkAPI) => {
   }
 });
 
+// Delete log from server
+export const deleteLog = createAsyncThunk("deleteLog", async (id, thunkAPI) => {
+  try {
+    const res = await fetch(`/api/logs/${id}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error);
+  }
+});
+
 const logSlice = createSlice({
   name: "logs",
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrent(state, action) {
+      state.current = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getLogs.pending, (state) => {
@@ -64,10 +79,21 @@ const logSlice = createSlice({
       .addCase(addLog.rejected, (state, action) => {
         console.log(action);
         state.loading = false;
+      })
+      .addCase(deleteLog.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteLog.fulfilled, (state, action) => {
+        state.loading = false;
+        state.logs.filter((log) => log.id !== action.payload);
+      })
+      .addCase(deleteLog.rejected, (state, action) => {
+        console.log(action);
+        state.loading = false;
       });
   },
 });
 
-export const {} = logSlice.actions;
+export const { setCurrent } = logSlice.actions;
 
 export default logSlice.reducer;
