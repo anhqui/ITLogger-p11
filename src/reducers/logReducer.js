@@ -67,6 +67,20 @@ export const updateLog = createAsyncThunk(
   }
 );
 
+// Search server logs
+export const searchLogs = createAsyncThunk(
+  "searchLogs",
+  async (searchTerm, thunkAPI) => {
+    try {
+      const res = await fetch(`/api/logs?q=${encodeURIComponent(searchTerm)}`);
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const logSlice = createSlice({
   name: "logs",
   initialState,
@@ -121,6 +135,17 @@ const logSlice = createSlice({
         );
       })
       .addCase(updateLog.rejected, (state, action) => {
+        console.log(action);
+        state.loading = false;
+      })
+      .addCase(searchLogs.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(searchLogs.fulfilled, (state, action) => {
+        state.loading = false;
+        state.logs = action.payload
+      })
+      .addCase(searchLogs.rejected, (state, action) => {
         console.log(action);
         state.loading = false;
       });
