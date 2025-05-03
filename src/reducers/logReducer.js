@@ -47,6 +47,26 @@ export const deleteLog = createAsyncThunk("deleteLog", async (id, thunkAPI) => {
   }
 });
 
+// Update log on server
+export const updateLog = createAsyncThunk(
+  "updateLog",
+  async (log, thunkAPI) => {
+    try {
+      const res = await fetch(`/api/logs/${log.id}`, {
+        method: "PUT",
+        body: JSON.stringify(log),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 const logSlice = createSlice({
   name: "logs",
   initialState,
@@ -88,6 +108,19 @@ const logSlice = createSlice({
         state.logs.filter((log) => log.id !== action.payload);
       })
       .addCase(deleteLog.rejected, (state, action) => {
+        console.log(action);
+        state.loading = false;
+      })
+      .addCase(updateLog.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateLog.fulfilled, (state, action) => {
+        state.loading = false;
+        state.logs.map((log) =>
+          log.id === action.payload.id ? action.payload : log
+        );
+      })
+      .addCase(updateLog.rejected, (state, action) => {
         console.log(action);
         state.loading = false;
       });
